@@ -1,0 +1,253 @@
+﻿<Page
+    x:Class="BuildnReleaseWP.ReleaseCreatePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BuildnReleaseWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" 
+    RequestedTheme="Dark">
+
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <!--<SlideNavigationTransitionInfo/>-->
+                    <CommonNavigationTransitionInfo/>
+                    <!--<ContinuumNavigationTransitionInfo/>-->
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+
+    <Page.Resources>
+
+        <Style x:Key="CustomPivotStyle" TargetType="Pivot">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <!--<Setter Property="Foreground" Value="White"/>-->
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <Grid/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Pivot">
+                        <Grid x:Name="RootElement" Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="Orientation">
+                                    <VisualState x:Name="Portrait">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Margin" Storyboard.TargetName="TitleContentControl">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PivotPortraitThemePadding}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Landscape">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Margin" Storyboard.TargetName="TitleContentControl">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PivotLandscapeThemePadding}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentControl x:Name="TitleContentControl" ContentTemplate="{TemplateBinding TitleTemplate}" Content="{TemplateBinding Title}" Style="{StaticResource PivotTitleContentControlStyle}"/>
+                            <ScrollViewer x:Name="ScrollViewer" HorizontalSnapPointsAlignment="Center" HorizontalSnapPointsType="MandatorySingle" HorizontalScrollBarVisibility="Hidden" Margin="{TemplateBinding Padding}" Grid.Row="1" Template="{StaticResource ScrollViewerScrollBarlessTemplate}" VerticalSnapPointsType="None" VerticalScrollBarVisibility="Disabled" VerticalScrollMode="Disabled" VerticalContentAlignment="Stretch" ZoomMode="Disabled">
+                                <PivotPanel x:Name="Panel" VerticalAlignment="Stretch">
+                                    <PivotHeaderPanel x:Name="Header" Background="#6928AA">
+                                        <PivotHeaderPanel.RenderTransform>
+                                            <CompositeTransform x:Name="HeaderTranslateTransform" TranslateX="0"/>
+                                        </PivotHeaderPanel.RenderTransform>
+                                    </PivotHeaderPanel>
+                                    <ItemsPresenter x:Name="PivotItemPresenter">
+                                        <ItemsPresenter.RenderTransform>
+                                            <TranslateTransform x:Name="ItemsPresenterTranslateTransform" X="0"/>
+                                        </ItemsPresenter.RenderTransform>
+                                    </ItemsPresenter>
+                                </PivotPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="artifactsDT">
+            <Grid Margin="0,2">
+                <StackPanel  Background="White" Padding="5,5">
+                    <StackPanel Orientation="Horizontal">
+                        <!--<TextBlock Text="Alias" Foreground="Gray"  FontSize="12"/>-->
+                        <!--<TextBlock Margin="2,0" Foreground="Gray"  FontSize="12" Text=":"/>-->
+                        <TextBlock Margin="2,0" Foreground="Black"  FontSize="12" Text="{Binding Artifact.Alias}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Select version for " Foreground="Gray"  FontSize="12"/>
+                        <!--<TextBlock Margin="2,0" Foreground="Gray"  FontSize="12" Text=":"/>-->
+                        <TextBlock Margin="2,0" Foreground="Gray"  FontSize="12" Text="{Binding Artifact.DefinitionReference.Definition.Name}"/>
+                        <TextBlock Margin="2,0" Foreground="Gray"  FontSize="12" Text="("/>
+                        <TextBlock Margin="0,0" Foreground="Gray"  FontSize="12" Text="{Binding Artifact.Type}"/>
+                        <TextBlock Margin="0,0" Foreground="Gray"  FontSize="12" Text=")"/>
+                    </StackPanel>
+                    <!--<StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Branch" Foreground="Gray"  FontSize="12"/>
+                        <TextBlock Margin="2,0" Foreground="Gray"  FontSize="12" Text=":"/>
+                        <TextBlock Margin="2,0" Foreground="#121212"  FontSize="12" Text="master"/>
+                    </StackPanel>-->
+
+                    <!--<TextBlock Text="Select version" Foreground="Gray"  FontSize="12" />-->
+                    <ComboBox Name="artifactVersionsCB" Margin="0,5" HorizontalAlignment="Stretch" 
+                              ItemsSource="{Binding ArtifactVersions}" SelectionChanged="artifactVersionsCB_SelectionChanged" 
+                              RequestedTheme="Light">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="-5,0">
+                                    <TextBlock Text="{Binding Name}" FontSize="12"/>
+                                    <TextBlock Text="{Binding SourceBranch}" Foreground="Gray" FontSize="10"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+    </Page.Resources>
+
+    <Grid x:Name="LayoutRoot">
+        <Grid.Background>
+            <ImageBrush ImageSource="ms-appx:///Images/bg_rockets_white.PNG"
+                    Stretch="UniformToFill" />
+        </Grid.Background>
+
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--<ContentDialog x:Name="CreateReleaseCB"
+                        Title="Queue build?"
+                        PrimaryButtonText="OK"
+                        SecondaryButtonText="Cancel" IsPrimaryButtonEnabled="True" IsSecondaryButtonEnabled="True"
+                       RequestedTheme="Dark" VerticalAlignment="Center"  HorizontalAlignment="Stretch" Visibility="Collapsed">
+            <StackPanel Margin="0,15">
+                <TextBlock Text="Do you want to queue build for:"
+                            TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
+                    <Image Source="ms-appx:///Images/build/ic_build.png"   Height="30" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Image Source="ms-appx:///Images/build/ic_branch_lightgray.png"   Height="25" VerticalAlignment="Center"/>
+                    <TextBlock FontWeight="Normal" VerticalAlignment="Center"
+                                       Foreground="White" Text="{Binding Repository.DefaultBranch, Converter={StaticResource BuildBranchToShortBranchConverter}}" />
+
+                </StackPanel>
+            </StackPanel>
+        </ContentDialog>-->
+
+      
+        <Border Background="#6928AA" Grid.Row="1">
+            <Grid Margin="10,10">
+
+                <TextBlock Name="definitionTB" Text="VSO.TFS.sjai.CDP.Release jss CDP" Foreground="White" TextWrapping="Wrap"/>
+
+            </Grid>
+        </Border>
+        <StackPanel Grid.Row="2" Margin="10,20,10,0">
+
+
+            <TextBlock Text="Description" Foreground="Black" FontSize="12"/>
+
+            <Border BorderBrush="#323232" Margin="0,10" BorderThickness="1.5" Background="#ffffff"  Visibility="Visible">
+                <StackPanel>
+                    <TextBox Name="descriptionTB" RequestedTheme="Light" FontSize="12" Height="50" BorderThickness="0"                 
+                       TextWrapping="Wrap" Text="{Binding Comments}"/>
+
+                    <TextBlock Name="noProDescriptionTB" Foreground="#545454" FontSize="12" Margin="10,5"
+                               Text=" - (Release created using the awesome 'DevopS Ninja' WP app: http://bit.ly/wpninjapro)" 
+                               TextWrapping="Wrap" Tapped="noProCommentsTB_Tapped" DoubleTapped="noProCommentsTB_DoubleTapped"/>
+                </StackPanel>
+
+            </Border>
+            
+            <!--<Border BorderThickness="1.5" BorderBrush="#767676" Padding="2" Name="descriptionReadOnlyTB"  Background="#ededed" Tapped="Border_Tapped" DoubleTapped="Border_DoubleTapped">
+                <TextBlock RequestedTheme="Light" FontSize="12" Height="50" TextWrapping="Wrap" 
+                           Text="Release triggered from 'DevOps Ninja' WP app - http://bit.ly/wpninjapro"/>
+            </Border>
+
+            <TextBox RequestedTheme="Light" FontSize="12" Height="50" Padding="5" Name="descriptionInputTB" TextWrapping="Wrap"
+                           Text="Release triggered from 'DevOps Ninja' WP app - http://bit.ly/wpninjapro"/>-->
+
+            <TextBlock Height="15"/>
+            <TextBlock Margin="0,0" Text="Select artifact(s) version" Foreground="Black" FontSize="12"/>
+            <Border BorderThickness="0" Background="Black" Height="0.5" Margin="0,0,0,5"/>
+
+            <ListView Name="artifactsLV" Margin="-10,5"
+                          SelectionChanged="artifactsLV_SelectionChanged"
+                          HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch"
+                          ItemTemplate="{StaticResource artifactsDT}">
+
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+
+        </StackPanel>
+
+        <Grid>
+            <Button Background="#6928AA" 
+                    HorizontalAlignment="Stretch" BorderThickness="0"
+                    HorizontalContentAlignment="Left" Height="35"  
+                    Margin="-5,0" 
+                    Name="headerBtn" Click="headerBtn_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="ms-appx:///Images/appbar.navigate.previous.png" VerticalAlignment="Center"/>
+                    <TextBlock Text="NEW RELEASE" Name="headerTB" 
+                               FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+        </Grid>
+
+        <Grid Grid.Row="1" Background="#aaffffff" Name="progressG" Visibility="Collapsed">
+            <ProgressBar x:Name="LoadingBar" Visibility="Visible" 
+                         IsEnabled="True" IsIndeterminate="true" 
+                         Height="100" HorizontalAlignment="Stretch"
+                         Foreground="#56218B"/>
+
+        </Grid>
+
+    </Grid>
+
+    <Page.BottomAppBar>
+        <CommandBar HorizontalContentAlignment="Center"
+                     Background="#212121" ClosedDisplayMode="Compact">
+            <!--<AppBarButton Name="homeABB" Icon="Home" Label="home" Click="homeABB_Click"/>-->
+            <AppBarButton />
+            <AppBarButton />
+            <AppBarButton Icon="Accept" HorizontalAlignment="Center"
+                          Label="create release" Name="newreleaseABB" Click="newreleaseABB_Click"/>
+            <AppBarButton />
+            <AppBarButton />
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>

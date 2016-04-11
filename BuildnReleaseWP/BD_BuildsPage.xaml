@@ -1,0 +1,391 @@
+﻿<Page
+    x:Class="BuildnReleaseWP.BD_BuildsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BuildnReleaseWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:valueconverter="using:BuildnReleaseWP.Converters"
+    RequestedTheme="Dark"
+    mc:Ignorable="d">
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <!--<SlideNavigationTransitionInfo/>-->
+                    <CommonNavigationTransitionInfo/>
+                    <!--<ContinuumNavigationTransitionInfo/>-->
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+
+    <Page.Resources>
+
+        <Style x:Key="CustomPivotStyle" TargetType="Pivot">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <!--<Setter Property="Foreground" Value="White"/>-->
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <Grid/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Pivot">
+                        <Grid x:Name="RootElement" Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="Orientation">
+                                    <VisualState x:Name="Portrait">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Margin" Storyboard.TargetName="TitleContentControl">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PivotPortraitThemePadding}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Landscape">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Margin" Storyboard.TargetName="TitleContentControl">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PivotLandscapeThemePadding}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentControl x:Name="TitleContentControl" ContentTemplate="{TemplateBinding TitleTemplate}" Content="{TemplateBinding Title}" Style="{StaticResource PivotTitleContentControlStyle}"/>
+                            <ScrollViewer x:Name="ScrollViewer" HorizontalSnapPointsAlignment="Center" HorizontalSnapPointsType="MandatorySingle" HorizontalScrollBarVisibility="Hidden" Margin="{TemplateBinding Padding}" Grid.Row="1" Template="{StaticResource ScrollViewerScrollBarlessTemplate}" VerticalSnapPointsType="None" VerticalScrollBarVisibility="Disabled" VerticalScrollMode="Disabled" VerticalContentAlignment="Stretch" ZoomMode="Disabled">
+                                <PivotPanel x:Name="Panel" VerticalAlignment="Stretch">
+                                    <PivotHeaderPanel x:Name="Header" Background="#0070c0">
+                                        <PivotHeaderPanel.RenderTransform>
+                                            <CompositeTransform x:Name="HeaderTranslateTransform" TranslateX="0"/>
+                                        </PivotHeaderPanel.RenderTransform>
+                                    </PivotHeaderPanel>
+                                    <ItemsPresenter x:Name="PivotItemPresenter">
+                                        <ItemsPresenter.RenderTransform>
+                                            <TranslateTransform x:Name="ItemsPresenterTranslateTransform" X="0"/>
+                                        </ItemsPresenter.RenderTransform>
+                                    </ItemsPresenter>
+                                </PivotPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <valueconverter:StringToUpperConverter x:Key="StringToUpperConverter" />
+        <valueconverter:StringToShortStringWithStartingEllipsisConverter x:Key="StringToShortStringWithStartingEllipsisConverter" />
+        <valueconverter:DateTimeConverter x:Key="DateTimeConverter" />
+        <valueconverter:BuildBranchToShortBranchConverter x:Key="BuildBranchToShortBranchConverter" />
+        <valueconverter:BuildQueuedStatusToImageConverter x:Key="BuildQueuedStatusToImageConverter" />
+        <valueconverter:BuildResultToImageConverter x:Key="BuildResultToImageConverter" />
+        <valueconverter:BuildResultToColorConverter x:Key="BuildResultToColorConverter" />
+
+        <SolidColorBrush x:Key="PivotHeaderForegroundUnselectedBrush" Color="White" />
+        <SolidColorBrush  x:Key="PivotHeaderForegroundSelectedBrush" Color="LightGray" />
+
+
+        <DataTemplate x:Key="buildCardDT">
+            <Grid Background="White" Margin="-7,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,10">
+                    <Ellipse Height="40" VerticalAlignment="Center" Width="40">
+                        <Ellipse.Fill>
+                            <ImageBrush Stretch="Uniform" ImageSource="{Binding Result, Converter={StaticResource BuildResultToImageConverter}}"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                </StackPanel>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,3,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding BuildNumber, Converter={StaticResource StringToShortStringWithStartingEllipsisConverter}, ConverterParameter=45}" 
+                                   FontSize="10" FontWeight="SemiBold" Foreground="#0070c0" HorizontalAlignment="Left"/>
+
+                        <TextBlock Text="{Binding Result, Converter={StaticResource StringToUpperConverter}}" FontSize="8" 
+                                   Grid.Column="1" FontWeight="SemiBold"
+                                   Margin="5,0" HorizontalAlignment="Right"
+                                   Foreground="{Binding Result,Converter={StaticResource BuildResultToColorConverter}}"/>
+
+                    </Grid>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock FontSize="10" FontWeight="Normal" Foreground="Gray" 
+                                   Text="{Binding Definition.Name, Converter={StaticResource StringToShortStringWithStartingEllipsisConverter}, ConverterParameter=45}" />
+                        <Image Source="ms-appx:///Images/ic_branch_lightgray.png" Margin="15,-5,0,0"  Height="22" HorizontalAlignment="Right"/>
+                        <TextBlock FontSize="10" FontWeight="Normal" Foreground="Gray" Text="{Binding SourceBranch, Converter={StaticResource BuildBranchToShortBranchConverter}}" />
+
+                    </StackPanel>
+                    <Grid Grid.Row="2" VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding RequestedFor.DisplayName}" 
+                                       FontSize="10" Foreground="#333333"/>
+                        <TextBlock Text="{Binding FinishTime, Converter={StaticResource DateTimeConverter}, ConverterParameter='ddd dd MMM'}" Grid.Column="1" Margin="0,0,5,0"
+                                       HorizontalAlignment="Right"
+                                       FontSize="10" Foreground="Gray"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="queuedBuildCardDT">
+            <Grid Background="White" Margin="-7,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,10">
+                    <Ellipse Height="40" VerticalAlignment="Center" Width="40">
+                        <Ellipse.Fill>
+                            <ImageBrush Stretch="Uniform" ImageSource="{Binding Status, Converter={StaticResource BuildQueuedStatusToImageConverter}}"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                </StackPanel>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,3,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding BuildNumber}" 
+                                   FontSize="10" FontWeight="SemiBold" Foreground="#0070c0" HorizontalAlignment="Left"/>
+
+
+                        <TextBlock Text="{Binding Status,Converter={StaticResource StringToUpperConverter}}" FontSize="8" 
+                                   Grid.Column="1" FontWeight="SemiBold"
+                                   Margin="5,0" HorizontalAlignment="Right"
+                                   Foreground="{Binding Status,Converter={StaticResource BuildResultToColorConverter}}"/>
+
+                    </Grid>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock FontSize="10" FontWeight="Normal" 
+                                       Foreground="Gray" Text="{Binding DefinitionName}" />
+                        <Image Source="ms-appx:///Images/ic_branch_lightgray.png" Margin="15,-5,0,0"  
+                               Height="22" HorizontalAlignment="Right"/>
+                        <TextBlock FontSize="10" FontWeight="Normal" 
+                                       Foreground="Gray" Text="{Binding SourceBranch}" />
+
+                    </StackPanel>
+                    <Grid Grid.Row="2" VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding RequestedForName}" 
+                                       FontSize="10" Foreground="#333333"/>
+                        <TextBlock Text="{Binding QueuedDateFormatted}" Grid.Column="1" Margin="0,0,5,0"
+                                       HorizontalAlignment="Right"
+                                       FontSize="10" Foreground="Gray"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid x:Name="LayoutRoot">
+        <Grid.Background>
+            <ImageBrush ImageSource="ms-appx:///Images/bg_building_white.PNG" Stretch="UniformToFill" />
+        </Grid.Background>
+
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <EntranceThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <ContentDialog x:Name="QueueBuildCB"
+                        Title="Queue build?"
+                        PrimaryButtonText="OK"
+                        SecondaryButtonText="Cancel" IsPrimaryButtonEnabled="True" IsSecondaryButtonEnabled="True"
+                       RequestedTheme="Dark" VerticalAlignment="Center"  HorizontalAlignment="Stretch">
+            <StackPanel Margin="0,15">
+                <TextBlock Text="Do you want to queue build for:"
+                            TextWrapping="Wrap" />
+                <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
+                    <Image Source="ms-appx:///Images/ic_build.png"   Height="30" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Image Source="ms-appx:///Images/ic_branch_lightgray.png"   Height="25" VerticalAlignment="Center"/>
+                    <TextBlock FontWeight="Normal" VerticalAlignment="Center" Foreground="LightGray"
+                               Text="{Binding Repository.DefaultBranch, Converter={StaticResource BuildBranchToShortBranchConverter}}" />
+
+                </StackPanel>
+            </StackPanel>
+
+        </ContentDialog>
+
+        <Border Grid.Row="1" Background="#aaefefef"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+
+        <Grid Grid.Row="1" Background="#aaffffff" Name="progressG" Visibility="Collapsed">
+            <ProgressBar x:Name="LoadingBar" Visibility="Visible" 
+                         IsEnabled="True" IsIndeterminate="true" 
+                         Height="100" HorizontalAlignment="Stretch"
+                         Foreground="#0070c0"/>
+
+        </Grid>
+        
+        <Pivot Title="" Style="{StaticResource CustomPivotStyle}"
+                Grid.Row="1" 
+                Margin="0,-28,0,0" 
+                Name="BuildP" 
+                SelectionChanged="BuildP_SelectionChanged"
+               Foreground="White">
+
+            <PivotItem Header="Details" Name="summaryPI" Margin="0,10">
+                <StackPanel  Name="summarySP" Padding="10" Visibility="Collapsed" RequestedTheme="Light">
+                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                        <TextBlock Name="nameTB" Text="{Binding Name}" />
+                        <TextBlock Text=" ( "/>
+                        <TextBlock Text="{Binding Type}"/>
+                        <TextBlock Text=" ) "/>
+                    </StackPanel>
+                    <TextBlock Height="15"/>
+
+                    <Border Background="#aa121212" BorderThickness="0" Padding="5,3" Margin="-5,5">
+                        <TextBlock Text="Repository details" Foreground="White"  FontSize="13"/>
+                    </Border>
+                    
+                    <StackPanel Orientation="Horizontal">                       
+                        <TextBlock Text="{Binding Repository.Name}"  TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+                        <TextBlock Text=" ( "/>
+                        <TextBlock Text="{Binding Repository.Type}"  TextWrapping="Wrap" VerticalAlignment="Bottom"/>
+                        <TextBlock Text=" ) "/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="ms-appx:///Images/ic_branch_gray.png" Height="18"/>
+                        <TextBlock Text="{Binding Repository.DefaultBranch}"  TextWrapping="Wrap" Margin="5,0"  VerticalAlignment="Bottom"/>
+                    </StackPanel>
+
+                    <TextBlock Height="15"/>
+                    <Border Background="#aa121212" BorderThickness="0" Padding="5,3" Margin="-5,5">
+                        <TextBlock Text="Build number format" Foreground="White"  FontSize="13"/>
+                    </Border>
+                    <TextBlock Text="{Binding BuildNumberFormat}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Height="15"/>
+                    <Border Background="#aa121212" BorderThickness="0" Padding="5,3" Margin="-5,5">
+                        <TextBlock Text="Queue" Foreground="White" FontSize="13"/>
+                    </Border>
+                    <TextBlock Text="{Binding Queue.Name}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
+
+                    <TextBlock Height="15"/>
+
+                    <Border Background="#aa121212" BorderThickness="0" Padding="5,3" Margin="-5,5">
+                        <TextBlock Text="Authored by" Foreground="White" FontSize="13"/>
+                    </Border>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                        <TextBlock Name="definitionTB" Text="{Binding AuthoredBy.DisplayName}"  Margin="0,0,0,5"/>
+                        <TextBlock Text="  on " TextWrapping="Wrap"/>
+                        <TextBlock Name="createdOnTB" Text="{Binding CreatedDate, Converter={StaticResource DateTimeConverter}, ConverterParameter='ddd dd MMM'}"  TextWrapping="Wrap" Margin="10,0"/>
+                    </StackPanel>
+                    <TextBlock Height="15"/>
+
+
+                </StackPanel>
+            </PivotItem>
+
+            <PivotItem Header="Completed builds" Name="completedBuildsPI" Margin="0,10">
+                <ListView Name="completedBuildsLV" 
+                          SelectionChanged="completedBuildsLV_SelectionChanged"
+                          HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch"
+                          ItemTemplate="{StaticResource buildCardDT}">
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </PivotItem>
+
+            <PivotItem Header="Queued builds" Name="queuedBuildsPI" Margin="0,10">
+                <ListView Name="queuedBuildsLV"
+                          SelectionChanged="queuedBuildsLV_SelectionChanged"
+                          HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch"
+                          ItemTemplate="{StaticResource queuedBuildCardDT}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+
+            </PivotItem>
+        </Pivot>
+
+        <Grid>
+            <Button Background="#0070c0" 
+                    HorizontalAlignment="Stretch" BorderThickness="0"
+                    HorizontalContentAlignment="Left" Height="35"  
+                    Margin="-5,0" 
+                    Name="bdBtn" Click="bdBtn_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="ms-appx:///Images/appbar.navigate.previous.png" VerticalAlignment="Center"/>
+                    <TextBlock Text="BUILD" Name="bdTB"
+                               FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+        </Grid>
+
+    </Grid>
+
+    <Page.BottomAppBar>
+        <CommandBar HorizontalContentAlignment="Center" 
+                    Background="#121212" ClosedDisplayMode="Compact">
+            <!--<AppBarButton Name="homeABB" Icon="Home" Label="home" Click="homeABB_Click"/>-->
+            <AppBarButton Name="refreshABB" Icon="Refresh" Label="refresh" Click="refreshABB_Click"/>
+            <AppBarButton HorizontalAlignment="Center" IsCompact="True"
+                          Label="new build" Name="newBuildABB" Click="newBuildABB_Click">
+                <AppBarButton.Icon>
+                    <BitmapIcon UriSource="ms-appx:///Images/ic_add.png" Margin="-8"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>

@@ -1,0 +1,454 @@
+﻿<Page
+    x:Class="BuildnReleaseWP.ReleasesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BuildnReleaseWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:valueconverter="using:BuildnReleaseWP.Converters"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    RequestedTheme="Dark">
+
+    <Page.Transitions>
+        <TransitionCollection>
+            <NavigationThemeTransition>
+                <NavigationThemeTransition.DefaultNavigationTransitionInfo>
+                    <!--<SlideNavigationTransitionInfo/>-->
+                    <CommonNavigationTransitionInfo/>
+                    <!--<ContinuumNavigationTransitionInfo/>-->
+                </NavigationThemeTransition.DefaultNavigationTransitionInfo>
+            </NavigationThemeTransition>
+        </TransitionCollection>
+    </Page.Transitions>
+
+    <Page.Resources>
+
+        <Style x:Key="CustomPivotStyle" TargetType="Pivot">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <!--<Setter Property="Foreground" Value="White"/>-->
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="ItemsPanel">
+                <Setter.Value>
+                    <ItemsPanelTemplate>
+                        <Grid/>
+                    </ItemsPanelTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Pivot">
+                        <Grid x:Name="RootElement" Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="Orientation">
+                                    <VisualState x:Name="Portrait">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Margin" Storyboard.TargetName="TitleContentControl">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PivotPortraitThemePadding}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Landscape">
+                                        <Storyboard>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Margin" Storyboard.TargetName="TitleContentControl">
+                                                <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource PivotLandscapeThemePadding}"/>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            <ContentControl x:Name="TitleContentControl" ContentTemplate="{TemplateBinding TitleTemplate}" Content="{TemplateBinding Title}" Style="{StaticResource PivotTitleContentControlStyle}"/>
+                            <ScrollViewer x:Name="ScrollViewer" HorizontalSnapPointsAlignment="Center" HorizontalSnapPointsType="MandatorySingle" HorizontalScrollBarVisibility="Hidden" Margin="{TemplateBinding Padding}" Grid.Row="1" Template="{StaticResource ScrollViewerScrollBarlessTemplate}" VerticalSnapPointsType="None" VerticalScrollBarVisibility="Disabled" VerticalScrollMode="Disabled" VerticalContentAlignment="Stretch" ZoomMode="Disabled">
+                                <PivotPanel x:Name="Panel" VerticalAlignment="Stretch">
+                                    <PivotHeaderPanel x:Name="Header" Background="#6928AA">
+                                        <PivotHeaderPanel.RenderTransform>
+                                            <CompositeTransform x:Name="HeaderTranslateTransform" TranslateX="0"/>
+                                        </PivotHeaderPanel.RenderTransform>
+                                    </PivotHeaderPanel>
+                                    <ItemsPresenter x:Name="PivotItemPresenter">
+                                        <ItemsPresenter.RenderTransform>
+                                            <TranslateTransform x:Name="ItemsPresenterTranslateTransform" X="0"/>
+                                        </ItemsPresenter.RenderTransform>
+                                    </ItemsPresenter>
+                                </PivotPanel>
+                            </ScrollViewer>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <valueconverter:ApprovalsListToImageConverter x:Key="ApprovalsListToImageConverter" />
+        <valueconverter:ApprovalToImageConverter x:Key="ApprovalToImageConverter" />
+        <valueconverter:ReleaseStatusToImageConverter x:Key="ReleaseStatusToImageConverter" /> 
+        <valueconverter:ApprovalTypeNStatusToTitleConverter x:Key="ApprovalTypeNStatusToTitleConverter" /> 
+        <valueconverter:StringToUpperConverter x:Key="StringToUpperConverter" />
+        <valueconverter:ReleaseStatusToColorConverter x:Key="ReleaseStatusToColorConverter" />
+        <valueconverter:DateTimeConverter x:Key="DateTimeConverter" />
+        <valueconverter:ReleaseEnvsToColorConverter x:Key="ReleaseEnvsToColorConverter" />
+        <valueconverter:ApprovalTypeToApprovalNameConverter x:Key="ApprovalTypeToApprovalNameConverter" /> 
+
+
+        <CollectionViewSource x:Key="DefinitionGroups" IsSourceGrouped="True"/>
+        <JumpListItemBackgroundConverter x:Key="BackgroundConverter"/>
+        <JumpListItemForegroundConverter x:Key="ForegroundConverter"/>
+
+        <DataTemplate x:Key="DefinitionJumpTemplate">
+
+            <Border Padding="2" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Border Background="{Binding Converter={StaticResource BackgroundConverter}}" 
+                        Width="55" Height="55" HorizontalAlignment="Left">
+                    <TextBlock Text="{Binding Group.Key}" 
+                               Foreground="{Binding Converter={StaticResource ForegroundConverter}}" 
+                               FontSize="35" Padding="6" 
+                               HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                </Border>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="DefinitionItemTemplate">
+            <Grid VerticalAlignment="Stretch" 
+                  HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="2" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border  Grid.Column="0">
+                    <Image 
+                       Height="30"
+                       Width="30"
+                       Source="ms-appx:///Images/ic_rd.png"/>
+                </Border>
+
+                <TextBlock Grid.Column="2" VerticalAlignment="Center" 
+                           Text="{Binding Name}"
+                           Foreground="#323232" HorizontalAlignment="Left" 
+                           FontSize="17"/>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="GroupHeaderTemplate">
+            <Border Background="Transparent" Padding="5">
+                <Border Background="#56218B" 
+                        BorderBrush="#56218B" 
+                        BorderThickness="0" Width="40" 
+                        Height="40" Margin="0,0,18,0" HorizontalAlignment="Left">
+                    <TextBlock Text="{Binding Key}" FontSize="32" Padding="6" 
+                               FontFamily="{StaticResource PhoneFontFamilySemiLight}" 
+                               HorizontalAlignment="Left" VerticalAlignment="Center"
+                               Foreground="White"/>
+                </Border>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ReleaseCardDT">
+            <Grid Background="White" Margin="-7,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,10">
+                    <Ellipse Height="40" VerticalAlignment="Center" Width="40">
+                        <Ellipse.Fill>
+                            <ImageBrush Stretch="Uniform" ImageSource="{Binding Status, Converter={StaticResource ReleaseStatusToImageConverter}}"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                </StackPanel>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,3,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Name}" 
+                                   FontSize="10" FontWeight="SemiBold" Foreground="#56218B" HorizontalAlignment="Left"/>
+
+                        <TextBlock Text="{Binding Status, Converter={StaticResource StringToUpperConverter}}" FontSize="8" 
+                                   Grid.Column="1" FontWeight="SemiBold"
+                                   Margin="5,0" HorizontalAlignment="Right"
+                                   Foreground="{Binding Status,Converter={StaticResource ReleaseStatusToColorConverter}}"/>
+                    </Grid>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock FontSize="10" FontWeight="Normal" 
+                                       Foreground="Gray" Text="{Binding ReleaseDefinition.Name}" />
+
+                    </StackPanel>
+                    <Grid Grid.Row="2" VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding CreatedBy.DisplayName}" 
+                                       FontSize="10" Foreground="#333333"/>
+                        <TextBlock Text="{Binding ModifiedOn, Converter={StaticResource DateTimeConverter}, ConverterParameter='ddd dd MMM'}" Grid.Column="1" Margin="0,0,5,0"
+                                       HorizontalAlignment="Right"
+                                       FontSize="10" Foreground="Gray"/>
+                    </Grid>
+
+                    <Grid Grid.Row="3">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Grid.Column="0" BorderThickness="0" Background="{Binding Environments,Converter={StaticResource ReleaseEnvsToColorConverter}, ConverterParameter=0}" Height="8" Margin="0,0,4,4" />
+                        <Border Grid.Column="1" BorderThickness="0" Background="{Binding Environments,Converter={StaticResource ReleaseEnvsToColorConverter}, ConverterParameter=1}" Height="8" Margin="0,0,4,4" />
+                        <Border Grid.Column="2" BorderThickness="0" Background="{Binding Environments,Converter={StaticResource ReleaseEnvsToColorConverter}, ConverterParameter=2}" Height="8" Margin="0,0,4,4" />
+                        <Border Grid.Column="3" BorderThickness="0" Background="{Binding Environments,Converter={StaticResource ReleaseEnvsToColorConverter}, ConverterParameter=3}" Height="8" Margin="0,0,4,4" />
+                        <Border Grid.Column="4" BorderThickness="0" Background="{Binding Environments,Converter={StaticResource ReleaseEnvsToColorConverter}, ConverterParameter=4}" Height="8" Margin="0,0,4,4" />
+                        <Border Grid.Column="5" BorderThickness="0" Background="{Binding Environments,Converter={StaticResource ReleaseEnvsToColorConverter}, ConverterParameter=5}" Height="8" Margin="0,0,4,4" />
+                        <TextBlock Grid.Column="6" FontWeight="SemiBold" Foreground="#444444" Text="{Binding Environments,Converter={StaticResource ReleaseEnvsToColorConverter}, ConverterParameter=6}" FontSize="10" VerticalAlignment="Top"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+        
+
+        <DataTemplate x:Key="approvalCardDT">
+            <Grid Background="White" Margin="-7,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="70"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Column="0" Margin="0,10">
+                    <Ellipse Height="40" VerticalAlignment="Center" Width="40">
+                        <Ellipse.Fill>
+                            <ImageBrush Stretch="Uniform" ImageSource="{Binding Status, Converter={StaticResource ApprovalToImageConverter}}"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <TextBlock Text="{Binding ApprovalType, Converter={StaticResource ApprovalTypeToApprovalNameConverter}}" FontSize="8" 
+                                   Grid.Column="1" FontWeight="SemiBold"
+                                    HorizontalAlignment="Center"
+                               Margin="5,0"
+                                   Foreground="#333333"/>
+                </StackPanel>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Stretch" Margin="0,3,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding ReleaseEnvironment.Name}" 
+                                   FontSize="10" FontWeight="SemiBold" 
+                                   Foreground="#2196F3" HorizontalAlignment="Left"/>
+
+
+                        <TextBlock Text="{Binding Status, Converter={StaticResource StringToUpperConverter}}" FontSize="8" 
+                                   Grid.Column="1" FontWeight="SemiBold"
+                                   Margin="5,0" HorizontalAlignment="Right"
+                                   Foreground="#2196F3"/>
+
+                    </Grid>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock FontSize="10" FontWeight="Normal" 
+                                       Foreground="Gray" Text="{Binding ReleaseDefinition.Name}" />
+                        <TextBlock Text=" / " FontSize="10" Foreground="Gray" FontWeight="SemiBold" Margin="3,0,0,0"/>
+                        <TextBlock FontSize="10" FontWeight="Normal" Margin="3,0,0,0"
+                                       Foreground="Gray" Text="{Binding Release.Name}" />
+
+                    </StackPanel>
+                    <Grid Grid.Row="2" VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Approver.DisplayName}" 
+                                   FontSize="10" Foreground="#333333"/>
+                        <TextBlock Text="{Binding ModifiedOn,Converter={StaticResource DateTimeConverter},ConverterParameter='ddd dd MMM'}" Grid.Column="1" Margin="0,0,5,0"
+                                       HorizontalAlignment="Right"
+                                       FontSize="10" Foreground="Gray"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </DataTemplate>
+
+    </Page.Resources>
+
+    <Grid x:Name="LayoutRoot">
+        <Grid.Background>
+            <ImageBrush ImageSource="ms-appx:///Images/bg_rockets_white.PNG"
+                    Stretch="UniformToFill" />
+        </Grid.Background>
+
+
+
+        <Grid.ChildrenTransitions>
+            <TransitionCollection>
+                <ContentThemeTransition/>
+            </TransitionCollection>
+        </Grid.ChildrenTransitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+       
+        <!--<ContentDialog x:Name="approvalCB"
+                        Title="" Grid.Row="1"
+                        PrimaryButtonText="Approve"
+                        SecondaryButtonText="Reject" IsPrimaryButtonEnabled="True" IsSecondaryButtonEnabled="True"
+                       RequestedTheme="Dark" VerticalAlignment="Center"  HorizontalAlignment="Stretch">
+            <StackPanel Margin="0,15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0" Source="{Binding ApprovalType, Converter={StaticResource ApprovalToImageConverter}}"  VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding ApprovalType, Converter={StaticResource ApprovalTypeNStatusToTitleConverter},ConverterParameter='pending'}"
+                            TextWrapping="Wrap" />
+                    <Button Grid.Column="2" Name="approvalCBCloseBtn" Click="approvalCBCloseBtn_Click">
+                        <Button.Content>
+                            <Image Source="ms-appx:///Images/ic_close.png"/>
+                        </Button.Content>
+                    </Button>
+                </Grid>
+                
+                <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
+                   
+                    <TextBlock Text="{Binding DefinitionName}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Image Source="ms-appx:///Images/ic_close.png"   Height="25" Margin="-5" VerticalAlignment="Center"/>
+                    <TextBlock FontWeight="Normal" VerticalAlignment="Center"
+                                       Foreground="LightGray" Text="" />
+
+                </StackPanel>
+            </StackPanel>
+
+        </ContentDialog>-->
+
+        <Pivot Title="" Style="{StaticResource CustomPivotStyle}"
+                   Grid.Row="1" 
+                   Name="ReleasesP" Margin="0,-28,0,0"
+                   SelectionChanged="ReleasesP_SelectionChanged">
+
+            <PivotItem Name="definitionsPI"
+                       Header="Definitions" Margin="0,10">
+
+                <SemanticZoom>
+                    <SemanticZoom.ZoomedInView>
+                        <ListView IsHoldingEnabled="True" Name="definitionsLV"
+                          ItemsSource="{Binding Source={StaticResource DefinitionGroups}}"
+                          ItemTemplate="{StaticResource DefinitionItemTemplate}"
+                          ContinuumNavigationTransitionInfo.ExitElementContainer="True"
+                          SelectionChanged="definitionsLV_SelectionChanged">
+                            <ListView.GroupStyle>
+                                <GroupStyle HidesIfEmpty="True" HeaderTemplate="{StaticResource GroupHeaderTemplate}"/>
+                            </ListView.GroupStyle>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                        </ListView>
+                    </SemanticZoom.ZoomedInView>
+                    <SemanticZoom.ZoomedOutView>
+                        <GridView HorizontalAlignment="Center" VerticalAlignment="Center"
+                          ItemsSource="{Binding Source={StaticResource DefinitionGroups}, Path=CollectionGroups}"
+                          ItemTemplate="{StaticResource DefinitionJumpTemplate}">
+                        </GridView>
+                    </SemanticZoom.ZoomedOutView>
+                </SemanticZoom>
+
+
+            </PivotItem>
+
+            <PivotItem Header="Releases" Name="releasesPI"  Margin="0,10">
+                <ListView Name="releasesLV" 
+                          SelectionChanged="releasesLV_SelectionChanged"
+                          HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch"
+                          ItemTemplate="{StaticResource ReleaseCardDT}">
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </PivotItem>
+
+            <PivotItem Header="Approvals" Name="approvalsPI"  Margin="0,10">
+                <Grid>
+                <!--<TextBlock Foreground="LightGray" Text="Loading..." FontSize="{StaticResource TextStyleLargeFontSize}" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
+                <ListView Name="approvalsLV"
+                          SelectionChanged="approvalsLV_SelectionChanged"
+                          HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Stretch"
+                          ItemTemplate="{StaticResource approvalCardDT}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    </ListView>
+                </Grid>
+            </PivotItem>
+        </Pivot>
+        <Grid>
+            <Button HorizontalAlignment="Stretch" BorderThickness="0"
+                    HorizontalContentAlignment="Left" Height="35"  
+                    Margin="-5,0" Background="#6928AA"
+                    Name="serviceBtn" Click="serviceBtn_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="ms-appx:///Images/appbar.navigate.previous.png" VerticalAlignment="Center"/>
+                    <TextBlock Text="RELEASES" Name="serviceTB"
+                               FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+        </Grid>
+
+
+        <Grid Grid.Row="1" Background="#aaffffff" Name="progressG" Visibility="Collapsed">
+            <ProgressBar x:Name="LoadingBar" Visibility="Visible"  Foreground="#56218B"
+                         IsEnabled="True" IsIndeterminate="true" 
+                         HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+
+        </Grid>
+        
+    </Grid>
+
+    <Page.BottomAppBar>
+        <CommandBar  Background="#212121" ClosedDisplayMode="Minimal">
+            <AppBarButton Name="homeABB" Icon="Home" Label="home" Click="homeABB_Click"/>
+            <AppBarButton Name="refreshABB" Icon="Refresh" Label="refresh" Click="refreshABB_Click"/>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>

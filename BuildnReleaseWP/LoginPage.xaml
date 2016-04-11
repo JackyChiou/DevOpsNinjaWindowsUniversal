@@ -1,0 +1,103 @@
+﻿<Page
+    x:Class="BuildnReleaseWP.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BuildnReleaseWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="clr-namespace:Windows.UI.Xaml.Controls;assembly=Windows.Foundation.UniversalApiContract"
+    mc:Ignorable="d"
+    RequestedTheme="Dark">
+
+    <Grid>
+        <!--<Image Source="/Images/bg_building_login.png" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>-->
+        <Grid>
+            <Grid.Background>
+                <ImageBrush ImageSource="/Images/bg_building_login.png"
+                    Stretch="UniformToFill" />
+            </Grid.Background>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid >
+                <Grid HorizontalAlignment="Right" Margin="0,0,10,0">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="ms-appx:///Images/ic_build.png"/>
+                        <Image Source="ms-appx:///Images/ic_release.png" Margin="4"/>
+                        <Image Source="ms-appx:///Images/ic_approval.png" Margin="4"/>
+
+                    </StackPanel>
+                </Grid>
+                <TextBlock Text="DevOps NiNJA"
+                   VerticalAlignment="Center"
+                       
+                   FontSize="20"
+                   Foreground="White" 
+                   FontWeight="SemiBold"
+                   Margin="10,0,0,0"/>
+            </Grid>
+
+            <Grid Grid.Row="1">
+
+                <Pivot Title="" Margin="0,-15,0,0">
+                    <PivotItem Header="Alternate creds">
+
+                        <StackPanel Margin="0,-10,0,0" >
+                            <Border Height="0.5" Margin="-10,10" BorderThickness="0" Background="#dedede"/>
+                            <TextBlock Height="10"/>
+                            <Grid>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Name="loginTextTB" Text="Enter "
+                                   Foreground="White" VerticalAlignment="Center"/>
+                                    <TextBlock Text=" alternate credentials " FontWeight="SemiBold"
+                                   Foreground="White" VerticalAlignment="Center"/>
+
+                                </StackPanel>
+                                <HyperlinkButton Content="Learn more" Foreground="#F06292" 
+                                 HorizontalAlignment="Right" Name="altCredHelpHLB"
+                                 Click="altCredHelpHLB_Click"/>
+
+                            </Grid>
+                            <TextBlock Height="30"/>
+
+
+                            <TextBlock Name="vstsUrlLabel" Text="VS Team Service URL"
+                                       Foreground="White"/>
+                            <TextBox Name="vstsUrlTB"/>
+                            <TextBlock Height="20"/>
+                            <TextBlock Name="userLabelTB" Text="Username"
+                                       Foreground="White"/>
+                            <TextBox Name="userTB"/>
+                            <TextBlock Height="20"/>
+
+                            <TextBlock Name="pwdLabelTB" Text="Password"
+                                       Foreground="White"/>
+                            <PasswordBox Name="pwdTB" />
+                            <TextBlock Height="40"/>
+
+                            <Button Name="loginBtn" 
+                                    HorizontalAlignment="Stretch" 
+                                    Content="Login"
+                                    FontSize="18"
+                                    Click="loginBtn_Click" 
+                                    Background="#E91E63"
+                                    Foreground="White"/>            
+                        </StackPanel>
+                    </PivotItem>
+
+                    <PivotItem Header="PAT" IsEnabled="False">
+                        <StackPanel Margin="0,-10,0,0" >
+                            <Border Height="0.5" Margin="-10,10" BorderThickness="0" Background="#dedede" VerticalAlignment="Top"/>
+                            <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Height="300">
+                                <TextBlock VerticalAlignment="Center" Foreground="#dedede" FontSize="20" HorizontalAlignment="Center" Text="Coming soon..."/>
+                            </Grid>
+                        </StackPanel>
+                    </PivotItem>
+                </Pivot>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

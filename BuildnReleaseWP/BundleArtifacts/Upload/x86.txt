@@ -1,0 +1,2 @@
+MainPackage=D:\RM Work\Git\openalm\BuildnReleaseWP\BuildnReleaseWP\bin\x86\Release\Upload\BuildnReleaseWP_1.2.1.0_x86.appx
+SymbolPackage=D:\RM Work\Git\openalm\BuildnReleaseWP\BuildnReleaseWP\AppPackages\BuildnReleaseWP_1.2.1.0\BuildnReleaseWP_1.2.1.0_x86.appxsym

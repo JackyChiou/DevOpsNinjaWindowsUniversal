@@ -1,0 +1,6 @@
+MainPackage=D:\RM Work\Git\openalm\BuildnReleaseWP\BuildnReleaseWP\bin\ARM\Release\Upload\BuildnReleaseWP_1.2.1.0_ARM.appx
+SymbolPackage=D:\RM Work\Git\openalm\BuildnReleaseWP\BuildnReleaseWP\AppPackages\BuildnReleaseWP_1.2.1.0\BuildnReleaseWP_1.2.1.0_ARM.appxsym
+ResourcePack=D:\RM Work\Git\openalm\BuildnReleaseWP\BuildnReleaseWP\_scale-100.appx
+ResourcePack=D:\RM Work\Git\openalm\BuildnReleaseWP\BuildnReleaseWP\_scale-125.appx
+ResourcePack=D:\RM Work\Git\openalm\BuildnReleaseWP\BuildnReleaseWP\_scale-150.appx
+ResourcePack=D:\RM Work\Git\openalm\BuildnReleaseWP\BuildnReleaseWP\_scale-400.appx
