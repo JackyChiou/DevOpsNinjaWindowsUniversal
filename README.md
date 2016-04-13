@@ -15,3 +15,6 @@ Snapshots from app: <br>
 <img src="/BuildnReleaseWP/Images/s5.png" width="200">
 <img src="/BuildnReleaseWP/Images/s6.png" width="200">
 <img src="/BuildnReleaseWP/Images/s7.png" width="200">
+
+### Credits
+* Icons & Splash screen - [Vikram Singh](https://www.linkedin.com/in/markivs)
