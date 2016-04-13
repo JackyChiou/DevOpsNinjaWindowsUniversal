@@ -6,7 +6,7 @@ This is sample Windows Universal app that is also available on Windows Store as 
 
 This app is mobile client for VS Team Services Build and Release services. 
 
-Snapshots from app:
+Snapshots from app: <br>
 <img src="/BuildnReleaseWP/Images/splash.png" width="200">
 <img src="/BuildnReleaseWP/Images/s1.png" width="200">
 <img src="/BuildnReleaseWP/Images/s2.png" width="200">
