@@ -14,3 +14,4 @@ Snapshots from app: <br>
 <img src="/BuildnReleaseWP/Images/s4.png" width="200">
 <img src="/BuildnReleaseWP/Images/s5.png" width="200">
 <img src="/BuildnReleaseWP/Images/s6.png" width="200">
+<img src="/BuildnReleaseWP/Images/s6.png" width="200">
